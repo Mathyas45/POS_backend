@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Producto;
 use Illuminate\Http\Request;
-
+use Illuminate\Validation\ValidationException;
 class ProductoController extends Controller
 {
     /**
@@ -24,20 +24,32 @@ class ProductoController extends Controller
     public function store(Request $request)
     {
         //
-
-        $request->validate([
-            'nombre' => 'required',
-            'codigo' => 'required',
+        try {
+            $request->validate([
+            'nombre' => 'required|unique:productos', // Validar que el nombre sea requerido y único en la tabla de productos
+            'codigo' => 'required|unique:productos', // Validar que el código sea requerido y único en la tabla de productos
             'precio' => 'required',
-
             'stock' => 'required',
             'stock_minimo' => 'required',
+            'categoria_id' => 'required',
+            'marca_id' => 'required'
 
-            'categoria_id' => 'required'
-        ]);
-
+            ], [
+                'nombre.required' => 'El nombre del producto es obligatorio.',
+                'nombre.unique' => 'La Producto ya existe.',
+                'codigo.required' => 'El codigo del producto es obligatorio.',
+                'codigo.unique' => 'La Producto ya existe.',
+                'precio.required' => 'El precio del producto es obligatorio.',
+                'stock.required' => 'El stock del producto es obligatorio.',
+                'stock_minimo.required' => 'El stock_minimo del producto es obligatorio.',
+                'categoria_id.required' => 'La categoria del producto es obligatorio.',
+                'marca_id.required' => 'La marca del producto es obligatorio.'
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => $e->validator->errors()->first(), 'status' => 400], 400);
+        }
         $nuevoProd = new Producto();
-        $nuevoProd->nombre = $request->nombre;
+        $nuevoProd->nombre = strtolower($request->nombre);
         $nuevoProd->codigo = $request->codigo;
         if ($archivo = $request->file('imagen')) {
             $nombre = $archivo->getClientOriginalName();
@@ -46,16 +58,16 @@ class ProductoController extends Controller
         } else {
             $nuevoProd->imagen = 'noimage.jpg';
         }
-        $nuevoProd->descripcion = $request->descripcion;
+        $nuevoProd->descripcion = strtolower($request->descripcion);
         $nuevoProd->precio = $request->precio;
         $nuevoProd->fecha_vencimiento = $request->fecha_vencimiento;
         $nuevoProd->stock = $request->stock;
         $nuevoProd->stock_minimo = $request->stock_minimo;
         $nuevoProd->categoria_id = $request->categoria_id;
+        $nuevoProd->marca_id = $request->marca_id;
 
         $nuevoProd->save();
-
-        return $nuevoProd;
+        return response()->json(['mensaje' => 'Producto creado con exito'], 201);
     }
 
     /**
@@ -73,6 +85,11 @@ class ProductoController extends Controller
     {
 
         $producto = Producto::find($id);
+          $request->validate([
+        'nombre' => 'unique:productos,nombre,' . $producto->id,
+        'codigo' => 'unique:productos,codigo,' . $producto->id,
+        'categoria_id' => 'exists:categorias,id',
+    ]);
         if ($request->has('nombre')) {
             $producto->nombre = $request->nombre;
         }
@@ -100,6 +117,10 @@ class ProductoController extends Controller
         if ($request->has('categoria_id')) {
             $producto->categoria_id = $request->categoria_id;
         }
+        if ($request->has('marca_id')) {
+            $producto->marca_id = $request->marca_id;
+        }
+
         $producto->save();
         return response()->json(['mensaje' => 'Producto actualizado con exito'], 200);
     }

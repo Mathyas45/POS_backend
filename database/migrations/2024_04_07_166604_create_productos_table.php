@@ -22,7 +22,10 @@ return new class extends Migration
             $table->integer('stock');
             $table->integer('stock_minimo');
             $table->unsignedBigInteger('categoria_id');
+            $table->unsignedBigInteger('marca_id');
+
             $table->foreign('categoria_id')->references('id')->on('categorias');
+            $table->foreign('marca_id')->references('id')->on('marcas');
 
             $table->timestamps();
         });

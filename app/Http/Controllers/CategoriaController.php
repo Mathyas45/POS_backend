@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
 
 class CategoriaController extends Controller
 {
@@ -22,14 +24,23 @@ class CategoriaController extends Controller
     public function store(Request $request)
     {
 
-        $request -> validate([
-            'nombre' => 'required'
-        ]);
+        try {
+            $request->validate([
+                'nombre' => 'required|unique:categorias'
+            ], [
+                'nombre.required' => 'El nombre de la categoría es obligatorio.',
+                'nombre.unique' => 'La categoría ya existe.'
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => $e->validator->errors()->first(), 'status' => 400], 400);
+        }
+
         $categoria = new Categoria();
         $categoria->nombre = $request->nombre;
         $categoria->descripcion = $request->descripcion;
         $categoria->save();
         return response()->json(['mensaje' => 'Categoria creada con exito'], 201);
+
     }
 
     /**
@@ -39,7 +50,6 @@ class CategoriaController extends Controller
     {
 
         return Categoria::find($id);
-
     }
 
     /**
@@ -56,8 +66,7 @@ class CategoriaController extends Controller
             $categoria->descripcion = $request->descripcion;
         }
         $categoria->save();
-        return response()->json(['mensaje'=>'Categoria actualizada con exito'], 200);
-
+        return response()->json(['mensaje' => 'Categoria actualizada con exito'], 200);
     }
 
     /**
