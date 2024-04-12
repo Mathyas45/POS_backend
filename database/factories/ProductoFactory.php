@@ -18,12 +18,18 @@ class ProductoFactory extends Factory
             'precio' => $this->faker->randomFloat(2, 1, 1000),
             'stock' => $this->faker->numberBetween(0, 100),
             'stock_minimo' => $this->faker->numberBetween(0, 50),
+            'estado' => $this->faker->randomElement(['activo', 'inactivo']),
+
             'categoria_id' => function () {
                 return \App\Models\Categoria::factory()->create()->id;
             },
             'marca_id' => function () {
                 return \App\Models\Marca::factory()->create()->id;
+            },
+            'unidad_id' => function () {
+                return \App\Models\Unidad::factory()->create()->id;
             }
+
         ];
     }
 }

@@ -15,11 +15,20 @@ class Producto extends Model
         'descripcion',
         'precio',
         'stock',
-        'categoria_id'
+        'categoria_id',
+        'unidad_id',
+        'marca_id',
+
 
     ];
     //Relacion uno a muchos inversa
     public function categoria(){
         return $this->belongsTo(Categoria::class);
+    }
+    public function unidad(){
+        return $this->belongsTo(Unidad::class);
+    }
+    public function marca(){
+        return $this->belongsTo(Marca::class);
     }
 }

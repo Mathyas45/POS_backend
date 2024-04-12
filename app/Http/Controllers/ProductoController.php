@@ -14,7 +14,7 @@ class ProductoController extends Controller
     {
 
         // return Producto::all(); //select * from productos
-        return Producto::with('categoria:id,nombre')->get(); // Carga la relación 'categoria' y selecciona solo el nombre
+        return Producto::with(['categoria:id,nombre', 'marca:id,nombre', 'unidad:id,nombre'])->get();
 
     }
 
@@ -32,7 +32,8 @@ class ProductoController extends Controller
             'stock' => 'required',
             'stock_minimo' => 'required',
             'categoria_id' => 'required',
-            'marca_id' => 'required'
+            'marca_id' => 'required',
+            'unidad_id' => 'required'
 
             ], [
                 'nombre.required' => 'El nombre del producto es obligatorio.',
@@ -43,7 +44,9 @@ class ProductoController extends Controller
                 'stock.required' => 'El stock del producto es obligatorio.',
                 'stock_minimo.required' => 'El stock_minimo del producto es obligatorio.',
                 'categoria_id.required' => 'La categoria del producto es obligatorio.',
+                'unidad_id.required' => 'La Unidad del producto es obligatorio.',
                 'marca_id.required' => 'La marca del producto es obligatorio.'
+
             ]);
         } catch (ValidationException $e) {
             return response()->json(['message' => $e->validator->errors()->first(), 'status' => 400], 400);
@@ -63,8 +66,13 @@ class ProductoController extends Controller
         $nuevoProd->fecha_vencimiento = $request->fecha_vencimiento;
         $nuevoProd->stock = $request->stock;
         $nuevoProd->stock_minimo = $request->stock_minimo;
+        $nuevoProd->estado = 'activo';
+
         $nuevoProd->categoria_id = $request->categoria_id;
         $nuevoProd->marca_id = $request->marca_id;
+        $nuevoProd->unidad_id = $request->unidad_id;
+
+        // Guardar en la base
 
         $nuevoProd->save();
         return response()->json(['mensaje' => 'Producto creado con exito'], 201);
@@ -85,7 +93,7 @@ class ProductoController extends Controller
     {
 
         $producto = Producto::find($id);
-          $request->validate([
+        $request->validate([
         'nombre' => 'unique:productos,nombre,' . $producto->id,
         'codigo' => 'unique:productos,codigo,' . $producto->id,
         'categoria_id' => 'exists:categorias,id',
@@ -119,6 +127,9 @@ class ProductoController extends Controller
         }
         if ($request->has('marca_id')) {
             $producto->marca_id = $request->marca_id;
+        }
+        if ($request->has('unidad_id')) {
+            $producto->unidad_id = $request->unidad_id;
         }
 
         $producto->save();

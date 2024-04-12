@@ -21,13 +21,21 @@ return new class extends Migration
             $table->dateTime('fecha_vencimiento') -> nullable();
             $table->integer('stock');
             $table->integer('stock_minimo');
+            $table->string('estado');
+
+
+
             $table->unsignedBigInteger('categoria_id');
             $table->unsignedBigInteger('marca_id');
+            $table->unsignedBigInteger('unidad_id');
+
 
             $table->foreign('categoria_id')->references('id')->on('categorias');
             $table->foreign('marca_id')->references('id')->on('marcas');
+            $table->foreign('unidad_id')->references('id')->on('unidades');
 
             $table->timestamps();
+
         });
     }
 

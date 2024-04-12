@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Marca;
-use App\Http\Requests\StoreMarcaRequest;
 use Illuminate\Http\Request;
-use App\Http\Requests\UpdateMarcaRequest;
 use Illuminate\Validation\ValidationException;
 
 class MarcaController extends Controller
@@ -31,7 +29,7 @@ class MarcaController extends Controller
                 'nombre.unique' => 'La marca ya existe.'
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['message' => $e->validator->errors()->first(), 'status' => 400], 400);
+            return response()->json(['mensaje' => $e->validator->errors()->first(), 'status' => 400], 400);
         }
 
         $marca = new Marca();
@@ -64,7 +62,7 @@ class MarcaController extends Controller
                     'nombre.unique' => 'La marca ya existe.'
                 ]);
             } catch (ValidationException $e) {
-                return response()->json(['message' => $e->validator->errors()->first(), 'status' => 400], 400);
+                return response()->json(['mensaje' => $e->validator->errors()->first(), 'status' => 400], 400);
             }
 
             if ($request->has('nombre')) {

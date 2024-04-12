@@ -32,7 +32,7 @@ class CategoriaController extends Controller
                 'nombre.unique' => 'La categoría ya existe.'
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['message' => $e->validator->errors()->first(), 'status' => 400], 400);
+            return response()->json(['mensaje' => $e->validator->errors()->first(), 'status' => 400], 400);
         }
 
         $categoria = new Categoria();

@@ -11,7 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('monedas', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->string('simbolo') -> nullable();
+            $table->string('estado');
+
+
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('monedas');
     }
 };
